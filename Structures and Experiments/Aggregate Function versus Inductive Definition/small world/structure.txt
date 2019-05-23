@@ -1,0 +1,41 @@
+// Agg Func versus Ind Def (small)
+structure World: V {
+    Time = {0..35}
+    
+    Weight = 0
+    
+    Height = {0..5}
+    GroundHeight = {0}
+    InspectionHeight = {1..2}
+    FlyHeight = {3..4}
+    RestrictedHeight = {5}
+    
+    Power = {0..50}
+    Battery_Init = 50
+    PowerUsage = {0..5}
+    
+    MoveToPower = 3
+    TakePicturePower = 2
+    NoOpPower = 1
+    LiftPower = 5
+    LowerPower = 2
+    
+    StaticLowPower = 20
+    CriticalPower = 5
+    
+    Distance = {0..3}
+    
+    Inspection = {"Insp1"}
+    
+    DistanceBetween =
+    	{"Home", "Home" -> 0; "Insp1", "Insp1" -> 0; "Home", "Insp1" -> 2; "Insp1", "Home" -> 2}
+
+    Location_Init = Home
+    Height_Init = 0
+    //DistanceToTarget_Init =
+    //DistanceToHome_Init =
+    DistanceToRA_Init = 2
+    Picture_Taken_Init = {}
+    //ClosestInspectionLocationToDo_Init =
+    DetourAssumption = 0
+}

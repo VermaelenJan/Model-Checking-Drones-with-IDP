@@ -1,0 +1,50 @@
+Running verifications with the classical time theory.
+Running verifications with the realistic battery.
+Running verifications with the static low power bound.
+==========================================
+Model(s) exist: true
+Duration: 9 seconds.
+==========================================
+World assumptions hold: true
+Duration: 12 seconds.
+==========================================
+Policy debug (pic height) correct: true
+Duration: 10 seconds.
+==========================================
+Policy debug (pic location) correct: true
+Duration: 13 seconds.
+==========================================
+Policy debug (move to TravelSpace) correct: true
+Duration: 13 seconds.
+==========================================
+Policy debug (landing only at home) correct: true
+Duration: 11 seconds.
+==========================================
+Goal property can hold: false
+Duration: 12 seconds.
+==========================================
+Goal property always holds: false
+Duration: 14 seconds.
+==========================================
+Restricted height property holds: true
+Duration: 12 seconds.
+==========================================
+The drone will always reach Home (using battery, world,... from structure) 1: true
+Duration: 12 seconds.
+==========================================
+The drone will always reach Home (using battery, world,... from structure) 2: true
+Duration: 16 seconds.
+==========================================
+The drone will always reach Home (using battery, world,... from structure) 3: true
+Duration: 11 seconds.
+==========================================
+The drone will always reach Home (using battery, world,... from structure) 4: true
+Duration: 12 seconds.
+==========================================
+The theories regarding reaching home are equal: true
+Duration: 13 seconds.
+==========================================
+Restricted area is never entered: true
+Duration: 13 seconds.
+==========================================
+Verifications completed after 183 seconds.

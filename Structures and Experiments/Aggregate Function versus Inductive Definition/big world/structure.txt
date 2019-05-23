@@ -1,0 +1,45 @@
+// Agg Func versus Ind Def (bigger)
+structure World: V {
+    Time = {0..100}
+    
+    Weight = 0
+    
+    Height = {0..8}
+    GroundHeight = {0}
+    InspectionHeight = {1..3}
+    FlyHeight = {4..7}
+    RestrictedHeight = {8}
+    
+    Power = {0..150}
+    Battery_Init = 150
+    PowerUsage = {0..5}
+    
+    MoveToPower = 3
+    TakePicturePower = 2
+    NoOpPower = 1
+    LiftPower = 5
+    LowerPower = 2
+    
+    StaticLowPower = 20
+    CriticalPower = 5
+    
+    Distance = {0..15}
+    
+    Inspection = {"Insp1"; "Insp2"; "Insp3"; "Insp4"}
+    
+    DistanceBetween =
+    	{"Home","Home" -> 0; "Home", "Insp1" -> 2; "Home", "Insp2" -> 7; "Home", "Insp3" -> 9; "Home", "Insp4" -> 11;
+        "Insp1", "Insp1" -> 0; "Insp1", "Home" -> 2; "Insp1", "Insp2" -> 3; "Insp1", "Insp3" -> 4; "Insp1", "Insp4" -> 5;
+    	"Insp2", "Insp2" -> 0; "Insp2", "Home" -> 7; "Insp2", "Insp1" -> 3; "Insp2", "Insp3" -> 8; "Insp2", "Insp4" -> 10;
+    	"Insp3", "Insp3" -> 0; "Insp3", "Home" -> 9; "Insp3", "Insp1" -> 4; "Insp3", "Insp2" -> 8; "Insp3", "Insp4" -> 14;
+        "Insp4", "Insp4" -> 0; "Insp4", "Home" -> 11; "Insp4", "Insp1" -> 5; "Insp4", "Insp2" -> 10; "Insp4", "Insp3" -> 14}
+
+	Location_Init = Home
+    Height_Init = 0
+    //DistanceToTarget_Init =
+    //DistanceToHome_Init =
+    DistanceToRA_Init = 5
+    Picture_Taken_Init = {}
+    //ClosestInspectionLocationToDo_Init =
+    DetourAssumption = 3
+}

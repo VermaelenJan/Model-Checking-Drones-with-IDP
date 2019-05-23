@@ -1,0 +1,52 @@
+Note: turn InvariantCheckingAssumptions off!
+
+Running verifications with the classical time theory.
+Running verifications with the realistic battery.
+Running verifications with the dynamic low power bound.
+==========================================
+Model(s) exist: false
+Duration: 4 seconds.
+==========================================
+World assumptions hold: true
+Duration: 4 seconds.
+==========================================
+Policy debug (pic height) correct: true
+Duration: 4 seconds.
+==========================================
+Policy debug (pic location) correct: true
+Duration: 4 seconds.
+==========================================
+Policy debug (move to TravelSpace) correct: true
+Duration: 5 seconds.
+==========================================
+Policy debug (landing only at home) correct: true
+Duration: 5 seconds.
+==========================================
+Goal property can hold: false
+Duration: 5 seconds.
+==========================================
+Goal property always holds: true
+Duration: 5 seconds.
+==========================================
+Restricted height property holds: true
+Duration: 5 seconds.
+==========================================
+The drone will always reach Home (using battery, world,... from structure) 1: true
+Duration: 5 seconds.
+==========================================
+The drone will always reach Home (using battery, world,... from structure) 2: true
+Duration: 5 seconds.
+==========================================
+The drone will always reach Home (using battery, world,... from structure) 3: true
+Duration: 5 seconds.
+==========================================
+The drone will always reach Home (using battery, world,... from structure) 4: true
+Duration: 5 seconds.
+==========================================
+The theories regarding reaching home are equal: true
+Duration: 7 seconds.
+==========================================
+Restricted area is never entered: true
+Duration: 5 seconds.
+==========================================
+Verifications completed after 73 seconds.

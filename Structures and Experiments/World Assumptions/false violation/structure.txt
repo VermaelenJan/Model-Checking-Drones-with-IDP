@@ -1,0 +1,44 @@
+// World Assumptions false violation.
+structure World: V {
+    Time = {0..50}
+    
+    Weight = 0
+
+    Height = {0..5}
+    GroundHeight = {0}
+    InspectionHeight = {1..2}
+    FlyHeight = {3..4}
+    RestrictedHeight = {5}
+    
+    Power = {0..100}
+    Battery_Init = 100
+    PowerUsage = {0..5}
+    
+    MoveToPower = 3
+    TakePicturePower = 2
+    NoOpPower = 1
+    LiftPower = 5
+    LowerPower = 2
+    
+    StaticLowPower = 25
+    CriticalPower = 5
+    
+    Distance = {0..5}
+    
+    Inspection = {"Insp1"; "Insp2"; "Insp3"}
+    
+    DistanceBetween =
+    	{"Home","Home" -> 0; "Home", "Insp1" -> 2; "Home", "Insp2" -> 3; "Home", "Insp3" -> 4;
+        "Insp1", "Insp1" -> 0; "Insp1", "Home" -> 2; "Insp1", "Insp2" -> 2; "Insp1", "Insp3" -> 4;
+    	"Insp2", "Insp2" -> 0; "Insp2", "Home" -> 3; "Insp2", "Insp1" -> 2; "Insp2", "Insp3" -> 2;
+    	"Insp3", "Insp3" -> 0; "Insp3", "Home" -> 4; "Insp3", "Insp1" -> 4; "Insp3", "Insp2" -> 2}
+
+    Location_Init = Home
+    Height_Init = 0
+    //DistanceToTarget_Init =
+    //DistanceToHome_Init =
+    DistanceToRA_Init = 2
+    Picture_Taken_Init = {}
+    //ClosestInspectionLocationToDo_Init =
+    DetourAssumption = 2
+}

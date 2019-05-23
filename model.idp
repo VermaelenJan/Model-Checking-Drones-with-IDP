@@ -1,0 +1,894 @@
+/////////////////////////////////////
+// Types, Predicates and Functions //
+/////////////////////////////////////
+
+vocabulary V {
+    
+    // Time
+    type Time isa nat
+    Start: Time
+    partial Next(Time): Time
+    BackLoopTime: Time
+    
+    // Weight
+    Weight: nat
+    
+    // Power
+    type Power isa nat
+    type PowerUsage isa Power
+    Battery(Time): Power
+    Battery_Init: Power
+    PowerUsageAt(Time): PowerUsage
+    
+    MoveToPower: PowerUsage
+    TakePicturePower: PowerUsage
+    NoOpPower: PowerUsage
+    LiftPower: PowerUsage
+    LowerPower: PowerUsage
+    
+    LowPower(Time): Power
+    StaticLowPower: Power
+    CriticalPower: Power
+    
+    AtNormalPower(Time)
+    AtLowPower(Time)
+    AtCriticalPower(Time)
+    
+    // Location
+    type Location constructed from {Home, TravelSpace, Insp1, Insp2}
+    type Inspection isa Location
+    AtHome(Time)
+    AtTravelSpace(Time)
+    AtInspection(Time)
+    AtInspectionToDo(Time)
+    
+    // Height
+    type Height isa nat
+    type GroundHeight isa Height
+    type InspectionHeight isa Height
+    type FlyHeight isa Height
+    type RestrictedHeight isa Height
+    AtGroundHeight(Time)
+    AtInspectionHeight(Time)
+    AtFlyHeight(Time)
+    AtRestrictedHeight(Time)
+    
+    // Distance
+    type Distance isa nat
+    partial DistanceBetween(Location, Location): Distance
+    CloseToRA(Time)
+    
+    partial ClosestInspectionLocationToDo(Time): Inspection //partial: when all inspections are done -> none
+    
+    // State
+    Curr_Location(Time): Location
+    Location_Init: Location
+    Curr_Height(Time): Height
+    Height_Init: Height
+    Curr_DistanceToTarget(Time): Distance
+    DistanceToTarget_Init: Distance
+    Curr_DistanceToHome(Time): Distance
+    DistanceToHome_Init: Distance
+    Curr_DistanceToRA(Time): Distance
+    DistanceToRA_Init: Distance
+    Target(Time): Location
+    ClosestInspectionLocationToDo_Init: Inspection
+    Picture_Taken(Time, Location)
+    Picture_Taken_Init(Location)
+    
+    C_Location(Time, Location)
+    CN_Location(Time, Location)
+    
+    C_Height(Time, Height)
+    CN_Height(Time, Height)
+    
+    C_DistanceToTarget(Time, Distance)
+    CN_DistanceToTarget(Time, Distance)
+    
+    C_DistanceToHome(Time, Distance)
+    CN_DistanceToHome(Time, Distance)
+    
+    C_DistanceToRA(Time, Distance)
+    CN_DistanceToRA(Time, Distance)
+    
+    C_Picture_Taken(Time, Location)
+    
+    AllPicturesTaken(Time)
+    
+    // Action
+    type Action constructed from {MoveTowardsTarget, TakePicture, NoOp, Lift, Lower, MoveAwayFromRA}
+    Plan(Time): Action
+    
+    // Non Determinism
+    NonDetMove(Time)
+    
+    NonDetIncreaseDistRA(Time)
+    NonDetDecreaseDistRA(Time)
+    
+    DetourAssumption: Distance
+}
+
+
+
+///////////////////////
+// World / structure //
+///////////////////////
+
+// Example World
+structure World: V {
+    Time = {0..35}
+    
+    Weight = 0
+
+    Height = {0..5}
+    GroundHeight = {0}
+    InspectionHeight = {1..2}
+    FlyHeight = {3..4}
+    RestrictedHeight = {5}
+    
+    Power = {0..100}
+    Battery_Init = 100
+    PowerUsage = {0..5}
+    
+    MoveToPower = 3
+    TakePicturePower = 2
+    NoOpPower = 1
+    LiftPower = 5
+    LowerPower = 2
+    
+    StaticLowPower = 25
+    CriticalPower = 5
+    
+    Distance = {0..4}
+    
+    Inspection = {"Insp1"; "Insp2"}
+    
+    DistanceBetween =
+    	{"Home","Home" -> 0; "Home", "Insp1" -> 2; "Home", "Insp2" -> 3;
+        "Insp1", "Insp1" -> 0; "Insp1", "Home" -> 2; "Insp1","Insp2" -> 2;
+    	"Insp2", "Insp2"-> 0; "Insp2","Insp1"-> 2; "Insp2","Home" -> 3}
+    
+    Location_Init = Home
+    Height_Init = 0
+    //DistanceToTarget_Init =
+    //DistanceToHome_Init =
+    DistanceToRA_Init = 2
+    Picture_Taken_Init = {}
+    //ClosestInspectionLocationToDo_Init =
+    DetourAssumption = 3
+}
+
+
+
+///////////////////
+// Time Theories //
+///////////////////
+
+// Classical finite time
+theory FiniteTimeTheory: V {
+    { 
+        Start = MIN[:Time].
+        !t[Time]: Next(t) = t+1 <- Time(t+1).
+    }
+}
+
+// Back Loop time
+theory BackLoopTimeTheory: V {
+    { 
+        Start = MIN[:Time].
+        !t[Time]: Next(t) = t+1 <- Time(t+1).
+        Next(MAX[:Time]) = BackLoopTime.
+    }
+}
+
+
+
+/////////////////////
+// Policy Theories //
+/////////////////////
+
+// Planning
+theory PolicyTheory: V {
+    {
+        !t[Time]: Plan(t) = Lift 				<- AtNormalPower(t) & ~AtHome(t) & AtGroundHeight(t).
+        
+        !t[Time]: Plan(t) = Lift 				<- AtNormalPower(t) & ~AllPicturesTaken(t) &  AtHome(t) & AtGroundHeight(t).
+        
+        !t[Time]: Plan(t) = Lift 				<- AtNormalPower(t) & ~AllPicturesTaken(t) & ~AtInspectionToDo(t) & AtInspectionHeight(t).
+        !t[Time]: Plan(t) = MoveTowardsTarget 			<- AtNormalPower(t) & ~AllPicturesTaken(t) & ~AtInspectionToDo(t) & AtFlyHeight(t) & ~CloseToRA(t).
+        !t[Time]: Plan(t) = MoveAwayFromRA	 		<- AtNormalPower(t) & ~AllPicturesTaken(t) & ~AtInspectionToDo(t) & AtFlyHeight(t) & CloseToRA(t).
+        !t[Time]: Plan(t) = TakePicture 			<- AtNormalPower(t) & ~AllPicturesTaken(t) &  AtInspectionToDo(t) & AtInspectionHeight(t).
+        !t[Time]: Plan(t) = Lower 				<- AtNormalPower(t) & ~AllPicturesTaken(t) &  AtInspectionToDo(t) & AtFlyHeight(t).
+        
+        !t[Time]: Plan(t) = Lift 				<- AtNormalPower(t) &  AllPicturesTaken(t) & ~AtHome(t) & AtInspectionHeight(t).
+        !t[Time]: Plan(t) = MoveTowardsTarget 			<- AtNormalPower(t) &  AllPicturesTaken(t) & ~AtHome(t) & AtFlyHeight(t) & ~CloseToRA(t).
+        !t[Time]: Plan(t) = MoveAwayFromRA	 		<- AtNormalPower(t) &  AllPicturesTaken(t) & ~AtHome(t) & AtFlyHeight(t) & CloseToRA(t).
+	!t[Time]: Plan(t) = Lower 				<- AtNormalPower(t) &  AllPicturesTaken(t) &  AtHome(t) & AtFlyHeight(t).
+        !t[Time]: Plan(t) = Lower 				<- AtNormalPower(t) &  AllPicturesTaken(t) &  AtHome(t) & AtInspectionHeight(t).
+        !t[Time]: Plan(t) = NoOp 				<- AtNormalPower(t) &  AllPicturesTaken(t) &  AtHome(t) & AtGroundHeight(t).
+        
+        !t[Time]: Plan(t) = Lift				<- AtLowPower(t) & ~AtHome(t) & AtGroundHeight(t).
+        !t[Time]: Plan(t) = Lift				<- AtLowPower(t) & ~AtHome(t) & AtInspectionHeight(t).
+        !t[Time]: Plan(t) = MoveTowardsTarget			<- AtLowPower(t) & ~AtHome(t) & AtFlyHeight(t) & ~CloseToRA(t).
+        !t[Time]: Plan(t) = MoveAwayFromRA			<- AtLowPower(t) & ~AtHome(t) & AtFlyHeight(t) & CloseToRA(t).
+        !t[Time]: Plan(t) = Lower				<- AtLowPower(t) &  AtHome(t) & AtFlyHeight(t).
+        !t[Time]: Plan(t) = Lower				<- AtLowPower(t) &  AtHome(t) & AtInspectionHeight(t).
+        !t[Time]: Plan(t) = NoOp				<- AtLowPower(t) &  AtHome(t) & AtGroundHeight(t).
+        
+        !t[Time]: Plan(t) = Lower				<- AtCriticalPower(t) & AtFlyHeight(t).
+        !t[Time]: Plan(t) = Lower				<- AtCriticalPower(t) & AtInspectionHeight(t).
+        !t[Time]: Plan(t) = NoOp				<- AtCriticalPower(t) & AtGroundHeight(t).
+        
+        !t[Time]: Plan(t) = Lower				<- AtRestrictedHeight(t).
+    }    
+}
+
+// Target
+theory TargetTheory: V {
+    {
+        // The target is the next Inspection Location
+        !t[Time]: Target(t) = ClosestInspectionLocationToDo(t) <- ~AllPicturesTaken(t) & AtNormalPower(t).
+        
+        // The target is Home
+        !t[Time]: Target(t) = Home <- AllPicturesTaken(t) & AtNormalPower(t).
+        !t[Time]: Target(t) = Home <- AtLowPower(t).
+
+        
+        // Extreme case:
+        !t[Time]: Target(t) = Curr_Location(t) <- AtCriticalPower(t).
+    }
+}
+
+
+
+////////////////////
+// World Theories //
+////////////////////
+
+// Maintaining and updating the Location
+theory LocationTheory: V {
+    {
+        // Initialize
+        Curr_Location(Start) = Location_Init.
+        
+        // Causation
+        !t[Time] loc[Location]: Curr_Location(Next(t)) = loc <- C_Location(t, loc).
+        
+        !t[Time] loc1[Location] loc2[Location]: CN_Location(t,loc1) <- C_Location(t,loc2) & loc1 ~= loc2.
+        
+        // Inertia
+        !t[Time] loc[Location]: Curr_Location(Next(t)) = loc <- Curr_Location(t) = loc & ~CN_Location(t, loc).
+
+    }
+
+    // Trigger Causation
+    {
+        !t[Time]: C_Location(t, Target(t)) <-
+        	Plan(t) = MoveTowardsTarget & Curr_DistanceToTarget(t) = 1 & Battery(t) >= MoveToPower & NonDetMove(t).
+        
+        !t[Time]: C_Location(t, TravelSpace) <-
+        	Plan(t) = MoveTowardsTarget & ~AtTravelSpace(t) & Target(t) ~= Curr_Location(t) &
+        		Battery(t) >= MoveToPower & NonDetMove(t).
+    }
+}
+
+// Maintaining and updating the Height
+theory HeightTheory: V {
+    {
+        // Initialize
+        Curr_Height(Start) = Height_Init.
+        
+        // Causation
+        !t[Time] h[Height]: Curr_Height(Next(t)) = h <- C_Height(t,h).
+        
+        !t[Time] h1[Height] h2[Height]: CN_Height(t, h1) <- C_Height(t,h2) & h1 ~= h2.
+        
+		// Inertia
+        !t[Time] h[Height]: Curr_Height(Next(t)) = h <- Curr_Height(t) = h & ~CN_Height(t,h).
+    }
+    
+    // Trigger Causation
+    {
+        !t[Time]: C_Height(t, Curr_Height(t) - 1) <- Plan(t) = NoOp & ?height[Height]: height = Curr_Height(t) - 1.
+        !t[Time]: C_Height(t, Curr_Height(t) - 1) <- Plan(t) = Lower & ?height[Height]: height = Curr_Height(t) - 1.
+        !t[Time]: C_Height(t, Curr_Height(t) + 1) <- Plan(t) = Lift &
+        	Battery(t) >= LiftPower & NonDetMove(t) & ?height[Height]: height = Curr_Height(t) + 1.
+        
+        !t[Time]: C_Height(t, Curr_Height(t) - 1) <- Plan(t) = Lift & ?height[Height]: height = Curr_Height(t) - 1 &
+        	Battery(t) < LiftPower.
+        !t[Time]: C_Height(t, Curr_Height(t) - 1) <- Plan(t) = TakePicture & ?height[Height]: height = Curr_Height(t) - 1 &
+        	Battery(t) < TakePicturePower.
+        !t[Time]: C_Height(t, Curr_Height(t) - 1) <- Plan(t) = MoveTowardsTarget & ?height[Height]: height = Curr_Height(t) - 1 &
+        	Battery(t) < MoveToPower.
+    }
+}
+
+// Maintaining and updating distance to current target and home
+theory DistanceTheory: V {
+    // Target
+    {
+        Curr_DistanceToTarget(Start) = DistanceToTarget_Init.
+        
+        // Re-initialize at every location
+        !t[Time]: Curr_DistanceToTarget(t) = DistanceBetween(Curr_Location(t),Target(t)) <-
+        	~AtTravelSpace(t) & Curr_Location(t) ~= Target(t).
+        !t[Time]: Curr_DistanceToTarget(t) = 0 <- Curr_Location(t) = Target(t).
+        
+        // Causation
+        !t[Time] dist[Distance]: Curr_DistanceToTarget(Next(t)) = dist <- C_DistanceToTarget(t,dist).
+        
+        !t[Time] dist1[Distance] dist2[Distance]: CN_DistanceToTarget(t,dist1) <-
+        	C_DistanceToTarget(t,dist2) & dist1 ~= dist2.
+        
+        // Inertia
+        !t[Time] dist[Distance]: Curr_DistanceToTarget(Next(t)) = dist <-
+        	Curr_DistanceToTarget(t) = dist & ~CN_DistanceToTarget(t,dist) & AtTravelSpace(Next(t)).
+        
+    }
+    
+    // Trigger causation (update when moving towards target)
+    {
+        !t[Time]: C_DistanceToTarget(t, Curr_DistanceToTarget(t)-1) <-
+        	Plan(t) = MoveTowardsTarget & Battery(t) >= MoveToPower & NonDetMove(t) & AtTravelSpace(Next(t)) &
+        	~(Target(t) ~= Home & Target(Next(t)) = Home) &
+        	~(Target(t) ~= TravelSpace & Target(Next(t)) = TravelSpace).
+        
+        !t[Time]: C_DistanceToTarget(t, Curr_DistanceToHome(Next(t))) <- AtTravelSpace(Next(t)) & Target(t) ~= Home & Target(Next(t)) = Home.
+        
+        !t[Time]: C_DistanceToTarget(t, 0) <- AtTravelSpace(Next(t)) & Target(t) ~= TravelSpace & Target(Next(t)) = TravelSpace.
+        
+        !t[Time]: C_DistanceToTarget(t, Curr_DistanceToTarget(t)+1) <-
+        	Plan(t) = MoveAwayFromRA & Battery(t) >= MoveToPower & NonDetMove(t) & Target(t) = Target(Next(t)). 
+    }
+    
+    // Home
+    {
+        Curr_DistanceToHome(Start) = DistanceToHome_Init.
+        
+        // Re-initialize at every location
+        !t[Time]: Curr_DistanceToHome(t) = DistanceBetween(Curr_Location(t),Home) <-
+        	~AtTravelSpace(t) & ~AtHome(t).
+        !t[Time]: Curr_DistanceToHome(t) = 0 <- AtHome(t).
+        
+        // Causation
+        !t[Time] dist[Distance]: Curr_DistanceToHome(Next(t)) = dist <- C_DistanceToHome(t,dist).
+        
+        !t[Time] dist1[Distance] dist2[Distance]: CN_DistanceToHome(t,dist1) <-
+        	C_DistanceToHome(t,dist2) & dist1 ~= dist2.
+        
+        // Inertia
+        !t[Time] dist[Distance]: Curr_DistanceToHome(Next(t)) = dist <-
+        	Curr_DistanceToHome(t) = dist & ~CN_DistanceToHome(t,dist) & AtTravelSpace(Next(t)).
+        
+    }
+    
+    // Trigger causation (update when moving)
+    {
+        !t[Time]: C_DistanceToHome(t, Curr_DistanceToHome(t)+1) <- AtTravelSpace(Next(t)) &
+        	Plan(t) = MoveTowardsTarget & Battery(t) >= MoveToPower & NonDetMove(t) & Target(t) ~= Home.
+        
+        !t[Time]: C_DistanceToHome(t, Curr_DistanceToHome(t)-1) <- AtTravelSpace(Next(t)) &
+        	Plan(t) = MoveTowardsTarget & Battery(t) >= MoveToPower & NonDetMove(t) & Target(t) = Home.
+        
+        !t[Time]: C_DistanceToHome(t, Curr_DistanceToHome(t)+1) <- AtTravelSpace(Next(t)) &
+        	Plan(t) = MoveAwayFromRA & Battery(t) >= MoveToPower & NonDetMove(t) & Target(t) = Home.
+        !t[Time]: C_DistanceToHome(t, Curr_DistanceToHome(t)-1) <- AtTravelSpace(Next(t)) &
+        	Plan(t) = MoveAwayFromRA & Battery(t) >= MoveToPower & NonDetMove(t) & Target(t) ~= Home.
+    }
+    
+    
+    // RA (Restricted Area)
+    {
+        // Initialize
+        Curr_DistanceToRA(Start) = DistanceToRA_Init.
+        
+        // Causation
+        !t[Time] dist[Distance]: Curr_DistanceToRA(Next(t)) = dist <- C_DistanceToRA(t,dist).
+        
+        !t[Time] dist1[Distance] dist2[Distance]: CN_DistanceToRA(t,dist1) <-
+        	C_DistanceToRA(t,dist2) & dist1 ~= dist2.
+        
+        // Inertia
+        !t[Time] dist[Distance]: Curr_DistanceToRA(Next(t)) = dist <-
+        	Curr_DistanceToRA(t) = dist & ~CN_DistanceToRA(t,dist).
+    }
+    
+    // Trigger causation (update when moving)
+    {
+        // Non-deterministic
+        !t[Time]: C_DistanceToRA(t, Curr_DistanceToRA(t) + 1) <- Plan(t) = MoveTowardsTarget & Battery(t) >= MoveToPower &
+        									NonDetMove(t) & NonDetIncreaseDistRA(t).
+        !t[Time]: C_DistanceToRA(t, Curr_DistanceToRA(t) - 1) <- Plan(t) = MoveTowardsTarget & Battery(t) >= MoveToPower &
+        									NonDetMove(t) & NonDetDecreaseDistRA(t).
+        
+        // Deterministic
+        !t[Time]: C_DistanceToRA(t, Curr_DistanceToRA(t) + 1) <- Plan(t) = MoveAwayFromRA & Battery(t) >= MoveToPower &
+        									NonDetMove(t).
+    }
+    
+    !t[Time]: ~(NonDetIncreaseDistRA(t) & NonDetDecreaseDistRA(t)).
+    
+    #{t1[Time] t2[Time]: t2 = Next(t1) & Curr_DistanceToTarget(t2) > Curr_DistanceToTarget(t1) & Target(t1) = Target(t2)}
+    	=< DetourAssumption.
+}
+
+// Taking and keeping pictures
+theory PictureTheory: V {
+    
+    {
+    	// Initialize: no pictures taken
+    	!loc[Location]: Picture_Taken(Start, loc) <- Picture_Taken_Init(loc).
+    	
+        // Causation and inertia
+        !t[Time] loc[Location]: Picture_Taken(Next(t), loc) <- C_Picture_Taken(t, loc).
+        !t[Time] loc[Location]: Picture_Taken(Next(t), loc) <- Picture_Taken(t, loc).
+    }
+    
+    // Trigger causation
+    {
+        !t[Time]: C_Picture_Taken(t,Curr_Location(t)) <- Plan(t) = TakePicture & Battery(t) >= TakePicturePower.
+    }
+}
+
+// Limit on the Non-Determinism, based on the weight of the drone
+theory NonDetLimitTheory: V {
+    
+    // Weight = 0 => Ideal case: every timestep is a NonDetMove timestep (an action will never fail = succeed in 1 time step)
+    !t[Time]: Weight = 0 => NonDetMove(t).
+    
+    // Weight = n => There will be max n consecutive non-NonDetMove timesteps (an action will succeed in n+1 time steps).
+    !t1[Time]: Weight > 0 & (!t2[Time]: 0=<t2-t1<Weight => ~NonDetMove(t2)) => NonDetMove(t1+Weight).
+    
+    // Always deterministic for: TakePicture, NoOp, Lower
+    !t: (Plan(t) = TakePicture | Plan(t) = NoOp | Plan(t) = Lower) => NonDetMove(t).
+}
+
+
+
+//////////////////////
+// Battery Theories //
+//////////////////////
+
+// Realistic Battery
+theory BatteryTheory: V {
+    {   
+        // NoOpPower
+        !t[Time]: PowerUsageAt(t) = NoOpPower <- Plan(t) = NoOp & Battery(t) >= NoOpPower.
+        !t[Time]: PowerUsageAt(t) = Battery(t) <- Plan(t) = NoOp & Battery(t) < NoOpPower.
+        
+        // LiftPower
+        !t[Time]: PowerUsageAt(t) = LiftPower <- Plan(t) = Lift & Battery(t) >= LiftPower.
+        !t[Time]: PowerUsageAt(t) = Battery(t) <- Plan(t) = Lift & Battery(t) < LiftPower.
+        
+        // LowerPower
+        !t[Time]: PowerUsageAt(t) = LowerPower <- Plan(t) = Lower & Battery(t) >= LowerPower.
+        !t[Time]: PowerUsageAt(t) = Battery(t) <- Plan(t) = Lower & Battery(t) < LowerPower.
+        
+        // MoveToPower
+        !t[Time]: PowerUsageAt(t) = MoveToPower <- (Plan(t) = MoveTowardsTarget | Plan(t) = MoveAwayFromRA) & Battery(t) >= MoveToPower.
+        !t[Time]: PowerUsageAt(t) = Battery(t) <- (Plan(t) = MoveTowardsTarget | Plan(t) = MoveAwayFromRA) & Battery(t) < MoveToPower.
+
+        // TakePicturePower
+        !t[Time]: PowerUsageAt(t) = TakePicturePower <- Plan(t) = TakePicture & Battery(t) >= TakePicturePower.
+        !t[Time]: PowerUsageAt(t) = Battery(t) <- Plan(t) = TakePicture & Battery(t) < TakePicturePower.
+    }
+    
+    {
+        // Initialize
+        Battery(Start) = Battery_Init.
+
+        // Aggregate Function
+        !t1[Time]: Battery(Next(t1)) = Battery_Init - sum{t2[Time]: t2 =< t1 : PowerUsageAt(t2)}.
+        
+        // Inductive Definition
+        //!t[Time]: Battery(Next(t)) = Battery(t) - PowerUsageAt(t).
+    }
+}
+
+// Dummy Battery
+theory FullBatteryTheory: V {
+    {
+        !t[Time]: Battery(t) = Battery_Init.
+    }
+}
+
+
+
+//////////////////////
+// Helper Functions //
+//////////////////////
+
+theory HelperFunctions: V {
+    
+    // AllPicturesTaken(Time)
+    {
+        !t[Time]: AllPicturesTaken(t) <- !iloc[Inspection]: Picture_Taken(t, iloc).
+    }
+    
+    // At___Heigh(Time)
+    {
+        !t[Time]: AtGroundHeight(t) <- ?height[GroundHeight]: Curr_Height(t) = height.
+        !t[Time]: AtInspectionHeight(t) <- ?height[InspectionHeight]: Curr_Height(t) = height.
+        !t[Time]: AtFlyHeight(t) <- ?height[FlyHeight]: Curr_Height(t) = height.
+        !t[Time]: AtRestrictedHeight(t) <- ?height[RestrictedHeight]: Curr_Height(t) = height.
+    }
+    
+    // -- Assumption -- No other Inspection(Location) becomes closer than the originally closest,
+    //	when we are moving around in the TravelSpace. (Always holds for a static defined world!)
+    // -- Assumption -- From any Location in the world (except TravelSpace) the "closest inspection location still to do"
+    //	is unique. (Checked in WorldAssumption.)
+    // ClosestInspectionLocationToDo(Time): Location
+    {
+        ClosestInspectionLocationToDo(Start) = ClosestInspectionLocationToDo_Init.
+        
+        !t[Time] loc[Inspection]: ClosestInspectionLocationToDo(t) = loc <- ~AtTravelSpace(t) & ~Picture_Taken(t, loc) &
+        	!iloc[Inspection]: ~Picture_Taken(t, iloc) => 
+        		(DistanceBetween(Curr_Location(t), loc) =< DistanceBetween(Curr_Location(t), iloc)).
+        
+        !t[Time] loc[Inspection]: ClosestInspectionLocationToDo(Next(t)) = ClosestInspectionLocationToDo(t) <-
+        	AtTravelSpace(Next(t)).
+    }
+    
+    // At___Location(Time)
+    {
+        !t[Time]: AtHome(t) <- Curr_Location(t) = Home.
+    	!t[Time]: AtTravelSpace(t) <- Curr_Location(t) = TravelSpace.
+    	!t[Time]: AtInspection(t) <- ?loc[Inspection]: Curr_Location(t) = loc.
+        !t[Time]: AtInspectionToDo(t) <- AtInspection(t) & ~Picture_Taken(t, Curr_Location(t)).
+    }
+    
+    // At ___Battery(Time)
+    {
+        !t1[Time]: AtNormalPower(t1) <- Battery(t1) > LowPower(t1) & ~?t2[Time]: Next(t2) = t1 & AtLowPower(t2).
+        //!t[Time]: AtNormalPower(t) <- Battery(t) > LowPower(t).
+    	!t[Time]: AtLowPower(Next(t)) <- AtLowPower(t) & Battery(Next(t)) > CriticalPower |
+        								 LowPower(Next(t)) >= Battery(Next(t)) > CriticalPower.
+        //!t[Time]: AtLowPower(t) <- LowPower(t) >= Battery(t) > CriticalPower.
+    	!t[Time]: AtCriticalPower(t) <- CriticalPower >= Battery(t).
+    }
+	
+    // CloseToRA(Time)
+    {
+        !t[Time]: CloseToRA(t) <- Curr_DistanceToRA(t) = 1.
+    }
+}
+
+
+theory DynamicLowPower: V {
+    {     
+        !t[Time]: LowPower(t) = max(MoveToPower + MoveToPower * (Weight + 1),
+        							LowerPower + (LiftPower * (Weight + 1))) +
+        						(Curr_DistanceToHome(t) * (Weight + 1) * MoveToPower) +
+        						(DetourAssumption * 2 * (Weight + 1) * MoveToPower) +
+        						(Curr_Height(t) * LowerPower) +
+        						CriticalPower.
+    }
+}
+
+theory StaticLowPower: V {
+    !t[Time]: LowPower(t) = StaticLowPower.
+}
+
+
+
+///////////////////////////
+// Verification Theories //
+///////////////////////////
+
+// At some point in time, the Goal is reached
+theory GoalTheory: V {
+	?t[Time]: AllPicturesTaken(t) & AtGroundHeight(t) & AtHome(t).
+}
+
+// At NO point in time, the goal is reached (= the goal is never reached)
+theory NoGoalTheory: V {
+	~?t[Time]: AllPicturesTaken(t) & AtGroundHeight(t) & AtHome(t).
+}
+
+// At some point in time, the drone is at an unrestricted height level
+theory HeightFailedTheory: V {
+	?t[Time] height[RestrictedHeight]: Curr_Height(t) = height.
+}
+
+// At the final point in time , the drone has NOT (reached home and landed)
+theory NotReachedHomeTheory1: V {
+    ~AtHome(MAX[:Time]) | ~AtGroundHeight(MAX[:Time]).
+}
+theory NotReachedHomeTheory2: V {
+    ~(AtHome(MAX[:Time]) & AtGroundHeight(MAX[:Time])).
+}
+theory NotReachedHomeTheory3: V {
+    ~?t1[Time]: !t2[Time]: t2 >= t1 => AtHome(t2) & AtGroundHeight(t2).
+}
+theory NotReachedHomeTheory4: V {
+    ~?t1[Time]: AtHome(t1) & AtGroundHeight(t1) & !t2[Time]: t2 > t1 => AtHome(t2) & AtGroundHeight(t2).
+}
+theory NotRerachedHomeTheoriesNotEqual: V {
+    ~(~AtHome(MAX[:Time]) | ~AtGroundHeight(MAX[:Time])
+    <=>
+    ~(AtHome(MAX[:Time]) & AtGroundHeight(MAX[:Time]))
+    <=>
+    ~?t1[Time]: !t2[Time]: t2 >= t1 => AtHome(t2) & AtGroundHeight(t2)
+    <=>
+    ~?t3[Time]: AtHome(t3) & AtGroundHeight(t3) & !t4[Time]: t4 > t3 => AtHome(t4) & AtGroundHeight(t4)).
+}
+
+// Landing else than home
+theory LandElseThanHomeTheory: V {
+    ?t[Time]: AtGroundHeight(t) & ~AtHome(t).
+}
+
+
+// check on: -- Assumption -- From any Location in the world (except TravelSpace) the "closest inspection location still to do"
+//	is unique. (Note: this assumption is stronger, it checks all the closest inspection locations, regarding if they are
+//	already visited or not.)
+theory WorldAssumptionTheory: V {
+    ~(!loc[Location]: (#{loc2[Inspection]: loc2 ~= loc} > 1 & loc ~= TravelSpace) =>
+    	?=1 loc2[Inspection]: loc2 ~= loc & !loc3[Inspection]: (loc3 ~= loc & loc3 ~= loc2) =>
+    		DistanceBetween(loc, loc2) < DistanceBetween(loc, loc3)).
+}
+
+// At some point in time, the Restricted Area is entered
+theory RAenteredTheory: V {
+    ?t[Time]: Curr_DistanceToRA(t) = 0.
+}
+
+// Extra basic assumptions for Invariant Checking (regarding initialization)
+theory InvariantCheckingAssumptions: V {
+    !loc[Location]: (#{loc2[Inspection]: loc2 ~= loc} > 1 & loc ~= TravelSpace) =>
+    	(?=1 loc2[Inspection]: loc2 ~= loc & (!loc3[Inspection]: (loc3 ~= loc & loc3 ~= loc2) =>
+    		DistanceBetween(loc, loc2) < DistanceBetween(loc, loc3))).
+    
+    !loc[Location]: loc ~= TravelSpace => DistanceBetween(loc, loc) = 0.
+    !loc1[Location] loc2[Location] x[Distance]: DistanceBetween(loc1, loc2) = x => DistanceBetween(loc2, loc1) = x.
+    !loc1[Location] loc2[Location]: loc1 ~= loc2 & loc1 ~= TravelSpace & loc2 ~= TravelSpace => DistanceBetween(loc1, loc2) > 1.
+    ~?loc[Location] x[Distance]: DistanceBetween(loc, TravelSpace) = x | DistanceBetween(TravelSpace, loc) = x.
+    
+    ~AtHome(MIN[:Time]) => ~AtGroundHeight(MIN[:Time]).
+    ~AtRestrictedHeight(MIN[:Time]).
+    DistanceToRA_Init > 0.
+    DistanceToHome_Init = 0 <=> AtHome(0).
+    DistanceToTarget_Init = 0 <=> Curr_Location(0) = Target(0).
+}
+
+
+
+///////////////////////////
+// Policy Debug Theories //
+///////////////////////////
+
+// Violation against height when taking picture
+theory PictureHeightAssertionTheory: V {
+    ?t[Time]: Plan(t) = TakePicture & ~AtInspectionHeight(t).
+}
+
+// Violation against location type when taking picture
+theory PictureLocationAssertionTheory: V {
+    ?t[Time]: Plan(t) = TakePicture & ~AtInspection(t).
+}
+
+// Violation against MoveTowards TravelSpace
+theory MoveToTravelSpaceTheory: V {
+    ?t[Time]: Plan(t) = MoveTowardsTarget & Target(t) = TravelSpace.
+}
+
+
+
+//////////
+// Main //
+//////////
+
+procedure main(backLoop, fullBattery, staticLowPower) {
+    stdoptions.nbmodels = 1
+    stdoptions.splitdefs = false
+        
+    /*
+    stdoptions.verbosity.grounding = 1
+    stdoptions.verbosity.solving = 1
+    stdoptions.verbosity.propagation = 1
+    stdoptions.verbosity.symmetrybreaking = 1
+    stdoptions.verbosity.approxdef = 1
+    stdoptions.verbosity.functiondetection = 1
+    stdoptions.verbosity.calculatedefinitions = 1
+    */
+    
+    S = World
+    if backLoop then
+        combined = BackLoopTimeTheory
+        print("Running verifications with the back loop time theory.")
+    else
+        combined = FiniteTimeTheory
+        print("Running verifications with the classical time theory.")
+    end
+        
+    if fullBattery then
+        combined = merge(combined, FullBatteryTheory)
+        print("Running verifications with the dummy battery.")
+    else
+        combined = merge(combined, BatteryTheory)
+        print("Running verifications with the realistic battery.")
+    end
+    
+    if staticLowPower then
+        combined = merge(combined, StaticLowPower)
+        print("Running verifications with the static low power bound.")
+    else
+        combined = merge(combined, DynamicLowPower)
+        print("Running verifications with the dynamic low power bound.")
+    end
+    
+    combined = merge(combined, PolicyTheory)
+    combined = merge(combined, TargetTheory)
+    combined = merge(combined, LocationTheory)
+    combined = merge(combined, NonDetLimitTheory)
+    combined = merge(combined, HeightTheory)
+    combined = merge(combined, DistanceTheory)
+    combined = merge(combined, PictureTheory)
+    combined = merge(combined, HelperFunctions)
+    
+    combined = merge(combined, InvariantCheckingAssumptions)
+    
+    
+    start_time = os.clock()
+    print("==========================================")
+    last_time = os.clock()
+    
+    checkSatVerificationProc(S, combined)
+    print("Duration: " .. tostring(os.difftime(os.clock(), last_time)) .. " seconds.")
+    print("==========================================")
+    last_time = os.clock()
+
+    WorldAssumptionsVerificationProc(S, combined)
+    print("Duration: " .. tostring(os.difftime(os.clock(),last_time)) .. " seconds.")
+    print("==========================================")
+    last_time = os.clock()
+    
+    PolicyDebugVerificationProc1(S, combined)
+    print("Duration: " .. tostring(os.difftime(os.clock(), last_time)) .. " seconds.")
+    print("==========================================")
+    last_time = os.clock()
+    
+    PolicyDebugVerificationProc2(S, combined)
+    print("Duration: " .. tostring(os.difftime(os.clock(), last_time)) .. " seconds.")
+    print("==========================================")
+    last_time = os.clock()
+    
+    PolicyDebugVerificationProc3(S, combined)
+    print("Duration: " .. tostring(os.difftime(os.clock(), last_time)) .. " seconds.")
+    print("==========================================")
+    last_time = os.clock()
+    
+    LandingElseThanHomeProc(S, combined)
+    print("Duration: " .. tostring(os.difftime(os.clock(), last_time)) .. " seconds.")
+    print("==========================================")
+    last_time = os.clock()
+    
+    anyGoalVerificationProc(S, combined)
+    print("Duration: " .. tostring(os.difftime(os.clock(), last_time)) .. " seconds.")
+    print("==========================================")
+    last_time = os.clock()
+    
+    alwaysGoalVerificationProc(S, combined)
+    print("Duration: " .. tostring(os.difftime(os.clock(), last_time)) .. " seconds.")
+    print("==========================================")
+    last_time = os.clock()
+    
+    HeightVerificationProc(S, combined)
+    print("Duration: " .. tostring(os.difftime(os.clock(), last_time)) .. " seconds.")
+    print("==========================================")
+    last_time = os.clock()
+    
+    ReachesHomeVerificationProc1(S, combined)
+    print("Duration: " .. tostring(os.difftime(os.clock(), last_time)) .. " seconds.")
+    print("==========================================")
+    last_time = os.clock()
+    ReachesHomeVerificationProc2(S, combined)
+    print("Duration: " .. tostring(os.difftime(os.clock(), last_time)) .. " seconds.")
+    print("==========================================")
+    last_time = os.clock()
+    ReachesHomeVerificationProc3(S, combined)
+    print("Duration: " .. tostring(os.difftime(os.clock(), last_time)) .. " seconds.")
+    print("==========================================")
+    last_time = os.clock()
+    ReachesHomeVerificationProc4(S, combined)
+    print("Duration: " .. tostring(os.difftime(os.clock(), last_time)) .. " seconds.")
+    print("==========================================")
+    last_time = os.clock()
+    ReachesHomeTheoriesEqualProc(S, combined)
+    print("Duration: " .. tostring(os.difftime(os.clock(), last_time)) .. " seconds.")
+    print("==========================================")
+    last_time = os.clock()
+    
+    restrictedAreaVerificationProc(S, combined)
+    print("Duration: " .. tostring(os.difftime(os.clock(), last_time)) .. " seconds.")
+    print("==========================================")
+    last_time = os.clock()
+    
+    print("Verifications completed after " .. tostring(os.difftime(os.clock(), start_time)) .. " seconds.")
+    
+    printmodels(modelexpand(combined,S))
+    
+    
+    // This visualization in Python requires matplotlib!
+    print("Calculating model to plot...")
+    file = io.open("Vis/last_output.txt", "w")
+    io.output(file)
+    io.write(tostring(onemodel(combined,S)))
+    io.close(file)
+    os.execute("python Vis/main.py last_output")
+}
+
+
+
+////////////////
+// Procedures //
+////////////////
+
+// Goal always reached
+procedure alwaysGoalVerificationProc(S,VerTheory) {
+    print("Goal property always holds: " .. tostring(not sat(merge(VerTheory,NoGoalTheory),S)))
+}
+
+// Goal can be reached
+procedure anyGoalVerificationProc(S,VerTheory) {
+    print("Goal property can hold: " .. tostring(sat(merge(VerTheory,GoalTheory),S)))
+}
+
+// Satisfying models exist (for the base theory)
+procedure checkSatVerificationProc(S,VerTheory) {
+    print("Model(s) exist: " .. tostring(sat(VerTheory,S)))
+}
+
+// Restricted height property never violated
+procedure HeightVerificationProc(S,VerTheory) {
+    print("Restricted height property holds: " .. tostring(not sat(merge(VerTheory,HeightFailedTheory),S)))
+}
+
+// Debug tests for the policy
+procedure PolicyDebugVerificationProc1(S,VerTheory) {
+    print("Policy debug (pic height) correct: " .. tostring(not sat(merge(VerTheory,PictureHeightAssertionTheory),S)))
+}
+
+procedure PolicyDebugVerificationProc2(S,VerTheory) {
+    print("Policy debug (pic location) correct: " .. tostring(not sat(merge(VerTheory,PictureLocationAssertionTheory),S)))
+}
+
+procedure PolicyDebugVerificationProc3(S,VerTheory) {
+    print("Policy debug (move to TravelSpace) correct: " .. tostring(not sat(merge(VerTheory,MoveToTravelSpaceTheory), S)))
+}
+
+procedure LandingElseThanHomeProc(S,VerTheory) {
+    print("Policy debug (landing only at home) correct: " .. tostring(not sat(merge(VerTheory,LandElseThanHomeTheory), S)))
+}
+
+// Reaching home property never violated
+procedure ReachesHomeVerificationProc1(S,VerTheory) {
+    print("The drone will always reach Home (using battery, world,... from structure) 1: " ..
+        tostring(not sat(merge(VerTheory,NotReachedHomeTheory1),S)))
+}
+procedure ReachesHomeVerificationProc2(S,VerTheory) {
+    print("The drone will always reach Home (using battery, world,... from structure) 2: " ..
+        tostring(not sat(merge(VerTheory,NotReachedHomeTheory2),S)))
+}
+procedure ReachesHomeVerificationProc3(S,VerTheory) {
+    print("The drone will always reach Home (using battery, world,... from structure) 3: " ..
+        tostring(not sat(merge(VerTheory,NotReachedHomeTheory3),S)))
+}
+procedure ReachesHomeVerificationProc4(S,VerTheory) {
+    print("The drone will always reach Home (using battery, world,... from structure) 4: " ..
+        tostring(not sat(merge(VerTheory,NotReachedHomeTheory4),S)))
+}
+procedure ReachesHomeTheoriesEqualProc(S,VerTheory) {
+    print("The theories regarding reaching home are equal: " ..
+        tostring(not sat(merge(VerTheory,NotRerachedHomeTheoriesNotEqual),S)))
+}
+
+// World assumptions hold
+procedure WorldAssumptionsVerificationProc(S, VerTheory) {
+    print("World assumptions hold: " .. tostring(not sat(merge(VerTheory,WorldAssumptionTheory),S)))
+}
+
+// Restricted area never violated
+procedure restrictedAreaVerificationProc(S, VerTheory) {
+    print("Restricted area is never entered: " .. tostring(not sat(merge(VerTheory,RAenteredTheory),S)))
+}

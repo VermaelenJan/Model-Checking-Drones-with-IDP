@@ -1,0 +1,28 @@
+// IDP init
+structure World: V {
+    Time = {0..1}
+    
+    Weight = 1
+    
+    Height = {0..5}
+    GroundHeight = {0}
+    InspectionHeight = {1..2}
+    FlyHeight = {3..4}
+    RestrictedHeight = {5}
+    
+    Power = {0..250}
+    Battery_Init = 250
+    PowerUsage = {0..5}
+    
+    MoveToPower = 3
+    TakePicturePower = 2
+    NoOpPower = 1
+    LiftPower = 5
+    LowerPower = 2
+    
+    CriticalPower = 5
+    
+    Distance = {0..10}
+    
+    Inspection = {"Insp1"; "Insp2"}
+}

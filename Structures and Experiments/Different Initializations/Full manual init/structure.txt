@@ -1,0 +1,42 @@
+// Full manual init
+structure World: V {
+    Time = {0..1}
+    
+    Weight = 1
+    
+    Height = {0..10}
+    GroundHeight = {0}
+    InspectionHeight = {1..3}
+    FlyHeight = {4..9}
+    RestrictedHeight = {10}
+    
+    Power = {0..200}
+    Battery_Init = 175
+    PowerUsage = {0..5}
+    
+    MoveToPower = 3
+    TakePicturePower = 2
+    NoOpPower = 1
+    LiftPower = 5
+    LowerPower = 2
+    
+    StaticLowPower = 5
+    CriticalPower = 5
+    
+    Distance = {0..7}
+    
+    Inspection = {"Insp1"; "Insp2"}
+    
+    DistanceBetween =
+    	{"Home","Home" -> 0; "Home", "Insp1" -> 4; "Home", "Insp2" -> 6;
+        "Insp1", "Insp1" -> 0; "Insp1", "Home" -> 4; "Insp1","Insp2" -> 5;
+    	"Insp2", "Insp2"-> 0; "Insp2","Insp1"-> 5; "Insp2","Home" -> 6}
+
+    Location_Init = TravelSpace
+    Height_Init = 6
+    DistanceToTarget_Init = 3
+    DistanceToHome_Init = 7
+    DistanceToRA_Init = 1
+    Picture_Taken_Init = {Insp1}
+    ClosestInspectionLocationToDo_Init = Insp2
+}

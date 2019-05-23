@@ -1,0 +1,225 @@
+\documentclass{article}
+
+\usepackage[color=red]{todonotes}
+\usepackage{mathtools}
+\usepackage{algorithmic}
+\usepackage{amsfonts}
+\usepackage{pdflscape}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{subfig}
+\usepackage{enumitem}
+
+\usepackage{lscape}
+\usepackage{longtable}
+
+\usepackage{savesym}
+\savesymbol{newfloat}
+\usepackage{floatrow}
+\restoresymbol{TXF}{newfloat}
+
+\begin{document}
+
+\title{The Policy of the Drone}
+\date{}
+\author{}
+\maketitle
+
+\section{Planning Policy}
+This file contains the complete version of the Planning Policy, expressed in natural language as well as in IDP syntax.
+\label{app:ppolicy}
+\subsection{In Natural Language}
+The drone has sufficient power\\
+\indent AND the drone is not at home\\
+\indent AND the drone is at ground height\\
+\indent THEN the drone will lift.
+\newline\\
+The drone has sufficient power\\
+\indent AND not all pictures are taken yet\\
+\indent AND the drone is at ground height\\
+\indent AND the drone is at home\\
+\indent THEN the drone will lift.
+\newline\\
+The drone has sufficient power\\
+\indent AND not all pictures are taken yet\\
+\indent AND the current location does not have to be inspected (any more)\\
+\indent AND the drone is at inspection height\\
+\indent THEN the drone will lift.
+\newline\\
+The drone has sufficient power\\
+\indent AND not all pictures are taken yet\\
+\indent AND the current location does not have to be inspected (any more)\\
+\indent AND the drone is at fly height\\
+\indent AND the drone is not close to Restricted Area\\
+\indent THEN the drone will move towards its current target.
+\newpage
+\noindent
+The drone has sufficient power\\
+\indent AND not all pictures are taken yet\\
+\indent AND the current location does not have to be inspected (any more)\\
+\indent AND the drone is at fly height\\
+\indent AND the drone is close to Restricted Area\\
+\indent THEN the drone will move away from the Restricted Area.
+\newline\\
+The drone has sufficient power\\
+\indent AND not all pictures are taken yet\\
+\indent AND the current location has to be inspected\\
+\indent AND the drone is at inspection height\\
+\indent THEN the drone will take a picture.
+\newline\\
+The drone has sufficient power\\
+\indent AND not all pictures are taken yet\\
+\indent AND the current location has to be inspected\\
+\indent AND the drone is at fly height\\
+\indent THEN the drone will lower.
+\newline\\
+The drone has sufficient power\\
+\indent AND all pictures are taken\\
+\indent AND the drone is not at home\\
+\indent AND the drone is at inspection height\\
+\indent THEN the drone will lift.
+\newline\\
+The drone has sufficient power\\
+\indent AND all pictures are taken\\
+\indent AND the drone is not at home\\
+\indent AND the drone is at fly height\\
+\indent AND the drone is not close to Restricted Area\\
+\indent THEN the drone will move towards its current target.
+\newline\\
+The drone has sufficient power\\
+\indent AND all pictures are taken\\
+\indent AND the drone is not at home\\
+\indent AND the drone is at fly height\\
+\indent AND the drone is close to Restricted Area\\
+\indent THEN the drone will move away from the Restricted Area.
+\newline\\
+The drone has sufficient power\\
+\indent AND all pictures are taken\\
+\indent AND the drone is at home\\
+\indent AND the drone is at fly height\\
+\indent THEN the drone will lower.
+\newpage
+\noindent
+The drone has sufficient power\\
+\indent AND all pictures are taken\\
+\indent AND the drone is at home\\
+\indent AND the drone is at inspection height\\
+\indent THEN the drone will lower.
+\newline\\
+The drone has sufficient power\\
+\indent AND all pictures are taken\\
+\indent AND the drone is at home\\
+\indent AND the drone is at ground height\\
+\indent THEN the drone will do nothing.
+\newline\\
+The drone has low power\\
+\indent AND the drone is not at home\\
+\indent AND the drone is at ground height\\
+\indent THEN the drone will lift.
+\newline\\
+The drone has low power\\
+\indent AND the drone is not at home\\
+\indent AND the drone is at inspection height\\
+\indent THEN the drone will lift.
+\newline\\
+The drone has low power\\
+\indent AND the drone is not at home\\
+\indent AND the drone is at fly height\\
+\indent AND the drone is not close to Restricted Area\\
+\indent THEN the drone will move towards its current target.
+\newline\\
+The drone has low power\\
+\indent AND the drone is not at home\\
+\indent AND the drone is at fly height\\
+\indent AND the drone is close to Restricted Area\\
+\indent THEN the drone will move away from the Restricted Area.
+\newline\\
+The drone has low power\\
+\indent AND the drone is at home\\
+\indent AND the drone is at fly height\\
+\indent THEN the drone will lower.
+\newline\\
+The drone has low power\\
+\indent AND the drone is at home\\
+\indent AND the drone is at inspection height\\
+\indent THEN the drone will lower.
+\newpage
+\noindent
+The drone has low power\\
+\indent AND the drone is at home\\
+\indent AND the drone is at ground height\\
+\indent THEN the drone will do nothing.
+\newline\\
+The drone has critical power\\
+\indent AND the drone is at fly height\\
+\indent THEN the drone will lower.
+\newline\\
+The drone has critical power\\
+\indent AND the drone is at inspection height\\
+\indent THEN the drone will lower.
+\newline\\
+The drone has critical power\\
+\indent AND the drone is at ground height\\
+\indent THEN the drone will do nothing.
+\newline\\
+The drone is at restricted height\\
+\indent THEN the drone will lower.
+
+\begin{landscape}
+\subsection{In IDP Syntax}
+\label{PlanningInIDPsyntax}
+$\forall$t[Time]: Plan(t) = Lift 				\\ \indent$\leftarrow$ AtNormalPower(t) $\wedge$ $\neg$AtHome(t) $\wedge$ AtGroundHeight(t).\vspace{2mm}\\
+$\forall$t[Time]: Plan(t) = Lift 				\\ \indent$\leftarrow$ AtNormalPower(t) $\wedge$ $\neg$AllPicturesTaken(t) $\wedge$  AtHome(t) $\wedge$ AtGroundHeight(t).\vspace{2mm}\\
+$\forall$t[Time]: Plan(t) = Lift 				\\ \indent$\leftarrow$ AtNormalPower(t) $\wedge$ $\neg$AllPicturesTaken(t) $\wedge$ $\neg$AtInspectionToDo(t) $\wedge$ AtInspectionHeight(t).\vspace{2mm}\\
+$\forall$t[Time]: Plan(t) = MoveTowardsTarget 	\\ \indent$\leftarrow$ AtNormalPower(t) $\wedge$ $\neg$AllPicturesTaken(t) $\wedge$ $\neg$AtInspectionToDo(t) $\wedge$ AtFlyHeight(t) $\wedge$ $\neg$CloseToRA(t).\vspace{2mm}\\
+$\forall$t[Time]: Plan(t) = MoveAwayFromRA	 	\\ \indent$\leftarrow$ AtNormalPower(t) $\wedge$ $\neg$AllPicturesTaken(t) $\wedge$ $\neg$AtInspectionToDo(t) $\wedge$ AtFlyHeight(t) $\wedge$ CloseToRA(t).\vspace{2mm}\\
+$\forall$t[Time]: Plan(t) = TakePicture 		\\ \indent$\leftarrow$ AtNormalPower(t) $\wedge$ $\neg$AllPicturesTaken(t) $\wedge$  AtInspectionToDo(t) $\wedge$ AtInspectionHeight(t).\vspace{2mm}\\
+$\forall$t[Time]: Plan(t) = Lower 				\\ \indent$\leftarrow$ AtNormalPower(t) $\wedge$ $\neg$AllPicturesTaken(t) $\wedge$  AtInspectionToDo(t) $\wedge$ AtFlyHeight(t).\vspace{2mm}\\
+$\forall$t[Time]: Plan(t) = Lift 				\\ \indent$\leftarrow$ AtNormalPower(t) $\wedge$  AllPicturesTaken(t) $\wedge$ $\neg$AtHome(t) $\wedge$ AtInspectionHeight(t).\vspace{2mm}\\
+$\forall$t[Time]: Plan(t) = MoveTowardsTarget 	\\ \indent$\leftarrow$ AtNormalPower(t) $\wedge$  AllPicturesTaken(t) $\wedge$ $\neg$AtHome(t) $\wedge$ AtFlyHeight(t) $\wedge$ $\neg$CloseToRA(t).\vspace{2mm}\\
+$\forall$t[Time]: Plan(t) = MoveAwayFromRA	 	\\ \indent$\leftarrow$ AtNormalPower(t) $\wedge$  AllPicturesTaken(t) $\wedge$ $\neg$AtHome(t) $\wedge$ AtFlyHeight(t) $\wedge$ CloseToRA(t).\vspace{2mm}\\
+$\forall$t[Time]: Plan(t) = Lower 				\\ \indent$\leftarrow$ AtNormalPower(t) $\wedge$  AllPicturesTaken(t) $\wedge$  AtHome(t) $\wedge$ AtFlyHeight(t).
+\newline\\
+$\forall$t[Time]: Plan(t) = Lower 				\\ \indent$\leftarrow$ AtNormalPower(t) $\wedge$  AllPicturesTaken(t) $\wedge$  AtHome(t) $\wedge$ AtInspectionHeight(t).\vspace{2mm}\\
+$\forall$t[Time]: Plan(t) = NoOp 				\\ \indent$\leftarrow$ AtNormalPower(t) $\wedge$  AllPicturesTaken(t) $\wedge$  AtHome(t) $\wedge$ AtGroundHeight(t).\vspace{2mm}\\
+$\forall$t[Time]: Plan(t) = Lift				\\ \indent$\leftarrow$ AtLowPower(t) $\wedge$ $\neg$AtHome(t) $\wedge$ AtGroundHeight(t).\vspace{2mm}\\
+$\forall$t[Time]: Plan(t) = Lift				\\ \indent$\leftarrow$ AtLowPower(t) $\wedge$ $\neg$AtHome(t) $\wedge$ AtInspectionHeight(t).\vspace{2mm}\\
+$\forall$t[Time]: Plan(t) = MoveTowardsTarget	\\ \indent$\leftarrow$ AtLowPower(t) $\wedge$ $\neg$AtHome(t) $\wedge$ AtFlyHeight(t) $\wedge$ $\neg$CloseToRA(t).\vspace{2mm}\\
+$\forall$t[Time]: Plan(t) = MoveAwayFromRA		\\ \indent$\leftarrow$ AtLowPower(t) $\wedge$ $\neg$AtHome(t) $\wedge$ AtFlyHeight(t) $\wedge$ CloseToRA(t).\vspace{2mm}\\
+$\forall$t[Time]: Plan(t) = Lower				\\ \indent$\leftarrow$ AtLowPower(t) $\wedge$  AtHome(t) $\wedge$ AtFlyHeight(t).\vspace{2mm}\\
+$\forall$t[Time]: Plan(t) = Lower				\\ \indent$\leftarrow$ AtLowPower(t) $\wedge$  AtHome(t) $\wedge$ AtInspectionHeight(t).\vspace{2mm}\\
+$\forall$t[Time]: Plan(t) = NoOp				\\ \indent$\leftarrow$ AtLowPower(t) $\wedge$  AtHome(t) $\wedge$ AtGroundHeight(t).\vspace{2mm}\\
+$\forall$t[Time]: Plan(t) = Lower				\\ \indent$\leftarrow$ AtCriticalPower(t) $\wedge$ AtFlyHeight(t).\vspace{2mm}\\
+$\forall$t[Time]: Plan(t) = Lower				\\ \indent$\leftarrow$ AtCriticalPower(t) $\wedge$ AtInspectionHeight(t).
+\end{landscape}
+\noindent
+$\forall$t[Time]: Plan(t) = NoOp				\\ \indent$\leftarrow$ AtCriticalPower(t) $\wedge$ AtGroundHeight(t).\vspace{2mm}\\
+$\forall$t[Time]: Plan(t) = Lower				\\ \indent$\leftarrow$ AtRestrictedHeight(t).
+
+\newpage
+
+\section{Target Policy}
+\label{app:tpolicy}
+This section contains the complete version of the Target Policy, expressed in natural language as well as in IDP syntax.
+\subsection{In Natural Language}
+The drone has sufficient power\\
+\indent AND not all pictures are taken yet\\
+\indent THEN the target is the closest inspection location still to inspect.
+\newline\\
+The drone has sufficient power\\
+\indent AND all pictures are taken\\
+\indent THEN the target is Home.
+\newline\\
+The drone has low power\\
+\indent THEN the target is Home.
+\newline\\
+The drone has critical power\\
+\indent THEN the target is the current location.
+
+\subsection{In IDP Syntax}
+$\forall$t[Time]: Target(t) = ClosestInspectionLocationToDo(t) \\ \indent$\leftarrow$$\neg$AllPicturesTaken(t) $\wedge$ AtNormalPower(t). \vspace{2mm}\\
+$\forall$t[Time]: Target(t) = Home \\ \indent$\leftarrow$AllPicturesTaken(t) $\wedge$ AtNormalPower(t). \vspace{2mm}\\
+$\forall$t[Time]: Target(t) = Home \\ \indent$\leftarrow$AtLowPower(t). \vspace{2mm}\\
+$\forall$t[Time]: Target(t) = Curr\_Location(t) \\ \indent$\leftarrow$AtCriticalPower(t). 
+
+\end{document}

@@ -1,0 +1,77 @@
+Running verifications with the back loop time theory.
+Running verifications with the realistic battery.
+Running verifications with the dynamic low power bound.
+Model 1
+=======
+structure  : V {
+  Distance = { 0..5 }
+  FlyHeight = { 3..4 }
+  GroundHeight = { 0..0 }
+  Height = { 0..5 }
+  Inspection = { Insp1 }
+  InspectionHeight = { 1..2 }
+  Power = { 0..40 }
+  PowerUsage = { 0..5 }
+  RestrictedHeight = { 5..5 }
+  Time = { 0..20 }
+  AllPicturesTaken = {  }
+  AtCriticalPower = { 12; 13; 14; 15; 16; 17; 18; 19; 20 }
+  AtFlyHeight = { 3; 4; 5; 6; 7 }
+  AtGroundHeight = { 0; 10; 11; 12; 13; 14; 15; 16; 17; 18; 19; 20 }
+  AtHome = { 0; 1; 2; 3; 7; 8; 9; 10; 11; 12; 13; 14; 15; 16; 17; 18; 19; 20 }
+  AtInspection = {  }
+  AtInspectionHeight = { 1; 2; 8; 9 }
+  AtInspectionToDo = {  }
+  AtLowPower = { 4; 5; 6; 7; 8; 9; 10; 11 }
+  AtNormalPower = { 0; 1; 2; 3 }
+  AtRestrictedHeight = {  }
+  AtTravelSpace = { 4; 5; 6 }
+  CN_DistanceToHome = { 3,0; 3,2; 3,3; 3,4; 3,5; 4,0; 4,1; 4,3; 4,4; 4,5; 5,0; 5,2; 5,3; 5,4; 5,5 }
+  CN_DistanceToRA = { 3,0; 3,2; 3,3; 3,4; 3,5; 4,0; 4,1; 4,3; 4,4; 4,5 }
+  CN_DistanceToTarget = { 3,0; 3,2; 3,3; 3,4; 3,5; 4,0; 4,1; 4,3; 4,4; 4,5; 5,0; 5,2; 5,3; 5,4; 5,5 }
+  CN_Height = { 0,0; 0,2; 0,3; 0,4; 0,5; 1,0; 1,1; 1,3; 1,4; 1,5; 2,0; 2,1; 2,2; 2,4; 2,5; 7,0; 7,1; 7,3; 7,4; 7,5; 8,0; 8,2; 8,3; 8,4; 8,5; 9,1; 9,2; 9,3; 9,4; 9,5 }
+  CN_Location = { 3,Home; 3,Insp1; 6,Insp1; 6,TravelSpace }
+  C_DistanceToHome = { 3,1; 4,2; 5,1 }
+  C_DistanceToRA = { 3,1; 4,2 }
+  C_DistanceToTarget = { 3,1; 4,2; 5,1 }
+  C_Height = { 0,1; 1,2; 2,3; 7,2; 8,1; 9,0 }
+  C_Location = { 3,TravelSpace; 6,Home }
+  C_Picture_Taken = {  }
+  CloseToRA = { 4 }
+  NonDetDecreaseDistRA = { 3 }
+  NonDetIncreaseDistRA = {  }
+  NonDetMove = { 0; 1; 2; 3; 4; 5; 6; 7; 8; 9; 10; 11; 12; 13; 14; 15; 16; 17; 18; 19; 20 }
+  Picture_Taken = {  }
+  Picture_Taken_Init = {  }
+  BackLoopTime = 17
+  Battery = { 0->40; 1->35; 2->30; 3->25; 4->22; 5->19; 6->16; 7->13; 8->11; 9->9; 10->7; 11->6; 12->5; 13->4; 14->3; 15->2; 16->1; 17->0; 18->0; 19->0; 20->0 }
+  Battery_Init = 40
+  ClosestInspectionLocationToDo = { 0->Insp1; 1->Insp1; 2->Insp1; 3->Insp1; 4->Insp1; 5->Insp1; 6->Insp1; 7->Insp1; 8->Insp1; 9->Insp1; 10->Insp1; 11->Insp1; 12->Insp1; 13->Insp1; 14->Insp1; 15->Insp1; 16->Insp1; 17->Insp1; 18->Insp1; 19->Insp1; 20->Insp1 }
+  ClosestInspectionLocationToDo_Init = Insp1
+  CriticalPower = 5
+  Curr_DistanceToHome = { 0->0; 1->0; 2->0; 3->0; 4->1; 5->2; 6->1; 7->0; 8->0; 9->0; 10->0; 11->0; 12->0; 13->0; 14->0; 15->0; 16->0; 17->0; 18->0; 19->0; 20->0 }
+  Curr_DistanceToRA = { 0->2; 1->2; 2->2; 3->2; 4->1; 5->2; 6->2; 7->2; 8->2; 9->2; 10->2; 11->2; 12->2; 13->2; 14->2; 15->2; 16->2; 17->2; 18->2; 19->2; 20->2 }
+  Curr_DistanceToTarget = { 0->2; 1->2; 2->2; 3->2; 4->1; 5->2; 6->1; 7->0; 8->0; 9->0; 10->0; 11->0; 12->0; 13->0; 14->0; 15->0; 16->0; 17->0; 18->0; 19->0; 20->0 }
+  Curr_Height = { 0->0; 1->1; 2->2; 3->3; 4->3; 5->3; 6->3; 7->3; 8->2; 9->1; 10->0; 11->0; 12->0; 13->0; 14->0; 15->0; 16->0; 17->0; 18->0; 19->0; 20->0 }
+  Curr_Location = { 0->Home; 1->Home; 2->Home; 3->Home; 4->TravelSpace; 5->TravelSpace; 6->TravelSpace; 7->Home; 8->Home; 9->Home; 10->Home; 11->Home; 12->Home; 13->Home; 14->Home; 15->Home; 16->Home; 17->Home; 18->Home; 19->Home; 20->Home }
+  DetourAssumption = 1
+  DistanceBetween = { Home,Home->0; Home,Insp1->2; Insp1,Home->2; Insp1,Insp1->0 }
+  DistanceToHome_Init = 0
+  DistanceToRA_Init = 2
+  DistanceToTarget_Init = 2
+  Height_Init = 0
+  LiftPower = 5
+  Location_Init = Home
+  LowPower = { 0->14; 1->16; 2->18; 3->20; 4->23; 5->26; 6->23; 7->20; 8->18; 9->16; 10->14; 11->14; 12->14; 13->14; 14->14; 15->14; 16->14; 17->14; 18->14; 19->14; 20->14 }
+  LowerPower = 2
+  MoveToPower = 3
+  Next = { 0->1; 1->2; 2->3; 3->4; 4->5; 5->6; 6->7; 7->8; 8->9; 9->10; 10->11; 11->12; 12->13; 13->14; 14->15; 15->16; 16->17; 17->18; 18->19; 19->20; 20->17 }
+  NoOpPower = 1
+  Plan = { 0->Lift; 1->Lift; 2->Lift; 3->MoveTowardsTarget; 4->MoveAwayFromRA; 5->MoveTowardsTarget; 6->MoveTowardsTarget; 7->Lower; 8->Lower; 9->Lower; 10->NoOp; 11->NoOp; 12->NoOp; 13->NoOp; 14->NoOp; 15->NoOp; 16->NoOp; 17->NoOp; 18->NoOp; 19->NoOp; 20->NoOp }
+  PowerUsageAt = { 0->5; 1->5; 2->5; 3->3; 4->3; 5->3; 6->3; 7->2; 8->2; 9->2; 10->1; 11->1; 12->1; 13->1; 14->1; 15->1; 16->1; 17->0; 18->0; 19->0; 20->0 }
+  Start = 0
+  StaticLowPower = 25
+  TakePicturePower = 2
+  Target = { 0->Insp1; 1->Insp1; 2->Insp1; 3->Insp1; 4->Home; 5->Home; 6->Home; 7->Home; 8->Home; 9->Home; 10->Home; 11->Home; 12->Home; 13->Home; 14->Home; 15->Home; 16->Home; 17->Home; 18->Home; 19->Home; 20->Home }
+  Weight = 0
+}

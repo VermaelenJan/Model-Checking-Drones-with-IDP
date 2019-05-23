@@ -1,0 +1,52 @@
+Note: turn InvariantCheckingAssumptions off!
+
+Running verifications with the classical time theory.
+Running verifications with the realistic battery.
+Running verifications with the dynamic low power bound.
+==========================================
+Model(s) exist: true
+Duration: 14 seconds.
+==========================================
+World assumptions hold: false
+Duration: 15 seconds.
+==========================================
+Policy debug (pic height) correct: true
+Duration: 16 seconds.
+==========================================
+Policy debug (pic location) correct: true
+Duration: 14 seconds.
+==========================================
+Policy debug (move to TravelSpace) correct: true
+Duration: 12 seconds.
+==========================================
+Policy debug (landing only at home) correct: true
+Duration: 29 seconds.
+==========================================
+Goal property can hold: true
+Duration: 22 seconds.
+==========================================
+Goal property always holds: true
+Duration: 18 seconds.
+==========================================
+Restricted height property holds: true
+Duration: 15 seconds.
+==========================================
+The drone will always reach Home (using battery, world,... from structure) 1: true
+Duration: 29 seconds.
+==========================================
+The drone will always reach Home (using battery, world,... from structure) 2: true
+Duration: 41 seconds.
+==========================================
+The drone will always reach Home (using battery, world,... from structure) 3: true
+Duration: 35 seconds.
+==========================================
+The drone will always reach Home (using battery, world,... from structure) 4: true
+Duration: 25 seconds.
+==========================================
+The theories regarding reaching home are equal: true
+Duration: 21 seconds.
+==========================================
+Restricted area is never entered: true
+Duration: 29 seconds.
+==========================================
+Verifications completed after 335 seconds.
