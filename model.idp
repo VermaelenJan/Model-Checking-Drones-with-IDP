@@ -283,7 +283,7 @@ theory HeightTheory: V {
         
         !t[Time] h1[Height] h2[Height]: CN_Height(t, h1) <- C_Height(t,h2) & h1 ~= h2.
         
-		// Inertia
+        // Inertia
         !t[Time] h[Height]: Curr_Height(Next(t)) = h <- Curr_Height(t) = h & ~CN_Height(t,h).
     }
     
