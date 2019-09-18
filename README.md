@@ -52,4 +52,4 @@ For obvious reasons, this repository also contains the file you are currently re
 
 
 ## Context
-This research is done as part of a thesis for obtaining the degree Master of Science in Engineering, Computer Science, Artificial Intelligence.
+This research was originally done as part of a thesis for obtaining the degree Master of Science in Engineering, Computer Science, Artificial Intelligence.
